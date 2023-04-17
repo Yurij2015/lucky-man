@@ -1,7 +1,6 @@
 @extends('main')
 @section('content')
     <div class="container">
-        kjkjkj
-        <a href="{{ route('platyer-register') }}">Player register</a>
+        <h3>Player block!</h3>
     </div>
 @stop

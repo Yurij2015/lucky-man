@@ -20,9 +20,12 @@ Route::get('/', static function () {
 });
 
 Route::get('/', [PlayerController::class, 'index'])->name('index');
-Route::get('/player-register', [PlayerController::class, 'platyerRegister'])->name('platyer-register');
+Route::get('/player-register-form', [PlayerController::class, 'playerRegisterForm'])->name('player-register-form');
+Route::post('/player-create', [PlayerController::class, 'playerCreate'])->name('player-create');
 
 
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Route::post('customer-create', [PlayerController::class, 'store'])->name('customer.create');

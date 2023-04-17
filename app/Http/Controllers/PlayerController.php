@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\PlayerSaveRequest;
+use App\Models\Player;
+use Illuminate\Http\RedirectResponse;
 
 class PlayerController extends Controller
 {
@@ -11,8 +13,14 @@ class PlayerController extends Controller
         return view('player.index');
     }
 
-    public function platyerRegister()
+    public function playerRegisterForm()
     {
         return view('player.register');
+    }
+
+    public function playerCreate(PlayerSaveRequest $saveRequest): RedirectResponse
+    {
+        Player::create($saveRequest->all());
+        return redirect()->route('index');
     }
 }
