@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\PlayerController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,6 +18,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', static function () {
     return view('main');
 });
+
+Route::get('/', [PlayerController::class, 'index'])->name('index');
+Route::get('/player-register', [PlayerController::class, 'platyerRegister'])->name('platyer-register');
+
 
 Auth::routes();
 
