@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PlayerSaveRequest;
+use App\Http\Services\PlayerService;
 use App\Models\Player;
 use App\Models\PlayerPoints;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 
 class PlayerController extends Controller
@@ -20,6 +20,18 @@ class PlayerController extends Controller
     public function updatePlayerForm(Player $player)
     {
         return view('admin.player.update', compact('player'));
+    }
+
+    public function addPlayerForm()
+    {
+        return view('admin.player.create');
+    }
+
+    public function playerCreate(PlayerService $playerService, PlayerSaveRequest $playerSaveRequest): RedirectResponse
+    {
+        $player = Player::create($playerSaveRequest->all());
+        $playerService->accessTokenCreate($player);
+        return redirect()->route('player-show', $player->id);
     }
 
     public function updatePlayer(Player $player, PlayerSaveRequest $playerSaveRequest): RedirectResponse

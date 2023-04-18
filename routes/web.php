@@ -38,5 +38,7 @@ Route::middleware('auth')->group(function () {
         ->name('player-destroy');
     Route::get('admin/player-show/{player}', [AdminPlayerController::class, 'showPlayer'])->name('player-show');
     Route::put('admin/player-update/{player}', [AdminPlayerController::class, 'updatePlayer'])->name('player-update');
+    Route::post('admin/player-create', [AdminPlayerController::class, 'playerCreate'])->name('admin-player-create');
+
 
 })->middleware('auth');
