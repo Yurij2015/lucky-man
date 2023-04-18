@@ -14,8 +14,8 @@ class PlayerController extends Controller
     {
 
         $token = $request->token;
-        $getPlayerViaToken = AccessToken::with('player')->where('token', $token)->first();
-        return view('player.index', ['player' => $getPlayerViaToken]);
+        $getPlayerViaToken = AccessToken::with('player')->where('token', $token)->where('status', true)->first();
+        return view('player.index', ['player' => $getPlayerViaToken?->player]);
     }
 
     public function playerRegisterForm(Request $request)
@@ -45,6 +45,6 @@ class PlayerController extends Controller
 
     public function getRandomStringToken(Player $player): string
     {
-        return md5($player->username . $player->phone);
+        return md5($player->username . $player->phone . time());
     }
 }
