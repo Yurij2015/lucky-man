@@ -10,9 +10,12 @@ use Illuminate\Http\Request;
 
 class PlayerController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('player.index');
+
+        $token = $request->token;
+        $getPlayerViaToken = AccessToken::with('player')->where('token', $token)->first();
+        return view('player.index', ['player' => $getPlayerViaToken]);
     }
 
     public function playerRegisterForm(Request $request)
@@ -26,16 +29,21 @@ class PlayerController extends Controller
     public function playerCreate(PlayerSaveRequest $playerSaveRequest): RedirectResponse
     {
         $player = Player::create($playerSaveRequest->all());
-        $token = AccessToken::create([
+        $tokenData = $this->accessTokenCreate($player);
+        return redirect()->route('player-register-form', ['token' => $tokenData->token]);
+    }
+
+    public function accessTokenCreate($player)
+    {
+        return AccessToken::create([
             'player_id' => $player->id,
-            'token' => $this->getRandomStringUniqid($player),
+            'token' => $this->getRandomStringToken($player),
             'token_validity_period' => date("Y-m-d\ H:i:s\ ", strtotime("+7 day")),
             'status' => true
         ]);
-        return redirect()->route('player-register-form', ['token' => $token->token]);
     }
 
-    public function getRandomStringUniqid(Player $player): string
+    public function getRandomStringToken(Player $player): string
     {
         return md5($player->username . $player->phone);
     }
