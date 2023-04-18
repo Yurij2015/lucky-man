@@ -24,7 +24,7 @@ Route::get('/', static function () {
 Route::get('/', [PlayerController::class, 'index'])->name('index');
 Route::get('/player-register-form', [PlayerController::class, 'playerRegisterForm'])->name('player-register-form');
 Route::post('/player-create', [PlayerController::class, 'playerCreate'])->name('player-create');
-Route::post('/player-game', [PlayerController::class, 'playerGame'])->name('player-game');
+Route::post('/', [PlayerController::class, 'playerGame'])->name('main');
 
 
 Auth::routes();

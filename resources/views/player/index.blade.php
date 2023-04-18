@@ -2,11 +2,14 @@
 @section('content')
     <div class="container">
         @if($player)
-            <h3>Are you that lucky guy? Check it out!!!</h3>
+            <div class="container">
+                <a href="{{ '/?token=' . $player->token }}">My token</a>
+            </div>
+            <h3>Are you that lucky guy? Check it out!!!99</h3>
             <span>{{ $player->username }}</span>
             <span>{{ $player->phone }}</span>
             <div class="game">
-                <form method="post" action="{{ route('player-game') }}">
+                <form method="post" action="{{ route('main') }}">
                     @csrf
                     <label>
                         <input hidden="hidden" name="token" value={{ $token }}>
