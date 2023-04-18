@@ -43,7 +43,37 @@ class PlayerController extends Controller
         $token = $request->token;
         $getPlayerViaToken = AccessToken::with('player')->where('token', $token)->where('status', true)->first();
         $points = random_int(1, 1000);
+        $result = $points % 2 ? 'Lose' : 'Win';
+        $prizeAmount = $points % 2 ? null : $this->getPrizeAmount($points);
         $playerService->playerPointsSave($getPlayerViaToken, $points);
-        return view('player.index', ['player' => $getPlayerViaToken, 'token' => $token, 'points' => $points]);
+        return view('player.index', [
+            'player' => $getPlayerViaToken,
+            'token' => $token,
+            'points' => $points,
+            'result' => $result,
+            'prizeAmount' => $prizeAmount
+        ]);
+    }
+
+    private function getPrizeAmount(int $points): ?float
+    {
+        foreach ($this->sourceData() as $key => $value) {
+            if ($points > $key) {
+                return $points * $value;
+            }
+        }
+        if ($points < 300) {
+            return $points * 0.1;
+        }
+        return null;
+    }
+
+    private function sourceData(): array
+    {
+        return [
+            900 => 0.7,
+            600 => 0.5,
+            300 => 0.3
+        ];
     }
 }
