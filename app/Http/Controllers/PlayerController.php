@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PlayerSaveRequest;
 use App\Models\AccessToken;
 use App\Models\Player;
+use App\Models\PlayerPoints;
+use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -15,7 +17,7 @@ class PlayerController extends Controller
 
         $token = $request->token;
         $getPlayerViaToken = AccessToken::with('player')->where('token', $token)->where('status', true)->first();
-        return view('player.index', ['player' => $getPlayerViaToken?->player]);
+        return view('player.index', ['player' => $getPlayerViaToken?->player, 'token' => $getPlayerViaToken?->token]);
     }
 
     public function playerRegisterForm(Request $request)
@@ -33,7 +35,7 @@ class PlayerController extends Controller
         return redirect()->route('player-register-form', ['token' => $tokenData->token]);
     }
 
-    public function accessTokenCreate($player)
+    private function accessTokenCreate($player)
     {
         return AccessToken::create([
             'player_id' => $player->id,
@@ -43,7 +45,27 @@ class PlayerController extends Controller
         ]);
     }
 
-    public function getRandomStringToken(Player $player): string
+    /**
+     * @throws Exception
+     */
+    public function playerGame(Request $request)
+    {
+        $token = $request->token;
+        $getPlayerViaToken = AccessToken::with('player')->where('token', $token)->where('status', true)->first();
+        $points = random_int(1, 1000);
+        $this->playerPointsSave($getPlayerViaToken, $points);
+        return view('player.index', ['player' => $getPlayerViaToken, 'token' => $token, 'points' => $points]);
+    }
+
+    private function playerPointsSave($getPlayerViaToken, $points): void
+    {
+        PlayerPoints::create([
+            'player_id' => $getPlayerViaToken?->player->id,
+            'points' => $points
+        ]);
+    }
+
+    private function getRandomStringToken(Player $player): string
     {
         return md5($player->username . $player->phone . time());
     }
