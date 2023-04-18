@@ -37,4 +37,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('admin/player-destroy/{player}', [AdminPlayerController::class, 'destroyPlayer'])
         ->name('player-destroy');
     Route::get('admin/player-show/{player}', [AdminPlayerController::class, 'showPlayer'])->name('player-show');
+    Route::put('admin/player-update/{player}', [AdminPlayerController::class, 'updatePlayer'])->name('player-update');
+
 })->middleware('auth');

@@ -7,7 +7,8 @@
     $btnEdit = '<button class="btn btn-xs btn-default text-primary mx-1 shadow" title="Edit">
                 <i class="fa fa-lg fa-fw fa-pen"></i>
                 </button>';
-    $btnDelete = '<button class="btn btn-xs btn-default text-danger mx-1 shadow" title="Delete">
+    $btnDelete = '<button class="btn btn-xs btn-default text-danger mx-1 shadow" title="Delete"
+    onclick="return confirm(\'Are you sure you want to delete the player?\')">
                   <i class="fa fa-lg fa-fw fa-trash"></i>
                   </button>';
     $btnDetails = '<button class="btn btn-xs btn-default text-teal mx-1 shadow" title="Details">
@@ -55,3 +56,6 @@
 
     </div>
 @endsection
+@section('js')
+    <script src="{{ asset('vendor/datatables/js/jquery.dataTables.js') }}"></script>
+@stop

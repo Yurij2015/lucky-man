@@ -10,6 +10,9 @@
     $btnDelete = '<button class="btn btn-xs btn-default text-danger mx-1 shadow" title="Delete">
                   <i class="fa fa-lg fa-fw fa-trash"></i>
                   </button>';
+    $config['paging'] = false;
+    $config['searching'] = false;
+    $config['info'] = false;
 @endphp
 @section('content')
     <div class="row">
@@ -37,7 +40,12 @@
                             <td>
                                 <nobr>
                                     <a href="{{ route('update-player-form', $player->id) }}">{!! $btnEdit !!}</a>
-                                    <a href="{{ route('player-destroy', $player->id) }}">{!! $btnDelete !!}</a>
+                                    <form method="POST" action="{{ route('player-destroy', $player->id) }}"
+                                          style="display:inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        {!! $btnDelete !!}<i/>
+                                    </form>
                                 </nobr>
                             </td>
                         </tr>
@@ -52,7 +60,7 @@
                             $heads = ['#', 'Token','Valid to', 'Status'];
                         @endphp
                         <x-adminlte-datatable id="table1" :heads="$heads" head-theme="light" theme="light" striped
-                                              hoverable bordered>
+                                              hoverable bordered :config="$config">
                             @foreach($player->accessToken as $row)
                                 <tr>
                                     <td>{!! $row->id !!}</td>
@@ -72,8 +80,8 @@
                         @php
                             $heads = ['#', 'Points', 'Game date'];
                         @endphp
-                        <x-adminlte-datatable id="table1" :heads="$heads" head-theme="light" theme="light" striped
-                                              hoverable bordered>
+                        <x-adminlte-datatable id="table2" :heads="$heads" head-theme="light" theme="light" striped
+                                              hoverable bordered :config="$config">
                             @foreach($playerPoints as $row)
                                 <tr>
                                     <td>{!! $row->id !!}</td>
@@ -92,3 +100,5 @@
 @section('js')
     <script src="{{ asset('vendor/datatables/js/jquery.dataTables.js') }}"></script>
 @stop
+
+
