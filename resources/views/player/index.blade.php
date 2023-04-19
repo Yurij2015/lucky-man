@@ -3,7 +3,8 @@
     <div class="container">
         @if($player)
             <div class="container">
-                <label for="myInput">My link</label>
+                <label for="myInput">Uniq link to user - {{ $player->username }} with phone
+                    - {{ $player->phone }}</label>
                 <div class="form-group">
                     <input class="form-control" type="text"
                            value="{{ route('index') . '/?token=' . $token }}"
@@ -13,29 +14,64 @@
                     <button class="btn btn-primary mt-2" onclick="copyLink()">
                         Copy my link!
                     </button>
+                    <button class="btn btn-outline-primary mt-2">Generate new link</button>
+                    <button class="btn btn-outline-primary mt-2">Destroy link</button>
                 </div>
             </div>
             <div class="container mt-5">
-                <h3>Are you that lucky guy? Check it out!!!</h3>
-                <span>{{ $player->username }}</span>
-                <span>{{ $player->phone }}</span>
-                <div class="game">
-                    <form method="post" action="{{ route('main') }}">
-                        @csrf
-                        <label>
-                            <input hidden="hidden" name="token" value={{ $token }}>
-                        </label>
-                        <button type="submit" class="btn btn-success">Im feeling lucky</button>
-                    </form>
+                <div class="row">
+                    <div class="col-md-8">
+                        <h3>Are you that lucky guy? Check it out!!!</h3>
+                        <div class="game">
+                            <form method="post" action="{{ route('main') }}">
+                                @csrf
+                                <label>
+                                    <input hidden="hidden" name="token" value={{ $token }}>
+                                </label>
+                                <button type="submit" class="btn btn-success">Im feeling lucky</button>
+                            </form>
+
+                            @if(isset($points))
+                                <div class="points"><h2>{{ $points }}</h2></div>
+                                <div class="result @if($prizeAmount) text-success @else text-danger @endif">
+                                    {{ $result }}
+                                </div>
+                                @if($prizeAmount)
+                                    <div class="prizeAmount"> Your prise is - {{ $prizeAmount }}</div>
+                                @endif
+                            @endif
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-outline-primary mt-2" onclick="playerHistory()">
+                            Show history
+                        </button>
+                        <div id="history" style="display: none">
+                            @if(isset($history))
+                                <h3 class="mt-3">Player history</h3>
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">Latest points</th>
+                                        <th scope="col">Lose/Win</th>
+                                        <th scope="col">Date</th>
+                                    </tr>
+                                    </thead>
+                                    @foreach($history as $item)
+                                        <tr>
+                                            <td>{{$item->points}}</td>
+                                            <td>{{$item->points% 2 ? 'Lose' : 'Win'}}</td>
+                                            <td>{{$item->created_at}}</td>
+                                        </tr>
+                                    @endforeach
+                                </table>
+                            @endif
+                        </div>
+                    </div>
                 </div>
-                @if(isset($points))
-                    {{ $points }}
-                    {{ $result }}
-                    {{ $prizeAmount }}
-                @endif
             </div>
         @else
-            <h3>Url is incorrect!</h3>
+            <h3>Go to register to get your uniq link!</h3>
         @endif
     </div>
 @stop
@@ -45,5 +81,14 @@
         copyText.select();
         copyText.setSelectionRange(0, 99999);
         navigator.clipboard.writeText(copyText.value);
+    }
+
+    function playerHistory() {
+        let x = document.getElementById("history");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
     }
 </script>

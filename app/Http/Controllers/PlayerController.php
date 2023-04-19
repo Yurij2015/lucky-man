@@ -6,6 +6,7 @@ use App\Http\Requests\PlayerSaveRequest;
 use App\Http\Services\PlayerService;
 use App\Models\AccessToken;
 use App\Models\Player;
+use App\Models\PlayerPoints;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -43,16 +44,22 @@ class PlayerController extends Controller
         $token = $request->token;
         $getPlayerViaToken = AccessToken::with('player')->where('token', $token)->where('status', true)->first();
         $points = random_int(1, 1000);
-        $result = $points % 2 ? 'Lose' : 'Win';
+        $result = $points % 2 ? 'Now you\'re the loser' : 'You are now the WINNER!!!';
         $prizeAmount = $points % 2 ? null : $this->getPrizeAmount($points);
         $playerService->playerPointsSave($getPlayerViaToken, $points);
         return view('player.index', [
-            'player' => $getPlayerViaToken,
+            'player' => $getPlayerViaToken?->player,
             'token' => $token,
             'points' => $points,
             'result' => $result,
-            'prizeAmount' => $prizeAmount
+            'prizeAmount' => $prizeAmount,
+            'history' => $this->playerHistory($getPlayerViaToken?->player->id)
         ]);
+    }
+
+    private function playerHistory($id)
+    {
+        return PlayerPoints::latest()->where('player_id', $id)->take(3)->get();
     }
 
     private function getPrizeAmount(int $points): ?float
