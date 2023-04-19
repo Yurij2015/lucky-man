@@ -14,7 +14,11 @@
                     <button class="btn btn-primary mt-2" onclick="copyLink()">
                         Copy my link!
                     </button>
-                    <button class="btn btn-outline-primary mt-2">Generate new link</button>
+                    <form method="post" action="{{ route('new-link-generate') }}">
+                        @csrf
+                        <input hidden="hidden" name="token" value="{{ $token }}">
+                        <button type="submit" class="btn btn-outline-primary mt-2">Generate new link</button>
+                    </form>
                     <button class="btn btn-outline-primary mt-2">Destroy link</button>
                 </div>
             </div>

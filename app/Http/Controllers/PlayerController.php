@@ -15,9 +15,8 @@ class PlayerController extends Controller
 {
     public function index(Request $request)
     {
-
         $token = $request->token;
-        $getPlayerViaToken = AccessToken::with('player')->where('token', $token)->where('status', true)->first();
+        $getPlayerViaToken = $this->getPlayerViaToken($token);
         return view('player.index', ['player' => $getPlayerViaToken?->player, 'token' => $getPlayerViaToken?->token]);
     }
 
@@ -42,7 +41,7 @@ class PlayerController extends Controller
     public function playerGame(Request $request, PlayerService $playerService)
     {
         $token = $request->token;
-        $getPlayerViaToken = AccessToken::with('player')->where('token', $token)->where('status', true)->first();
+        $getPlayerViaToken = $this->getPlayerViaToken($token);
         $points = random_int(1, 1000);
         $result = $points % 2 ? 'Now you\'re the loser' : 'You are now the WINNER!!!';
         $prizeAmount = $points % 2 ? null : $this->getPrizeAmount($points);
@@ -55,6 +54,23 @@ class PlayerController extends Controller
             'prizeAmount' => $prizeAmount,
             'history' => $this->playerHistory($getPlayerViaToken?->player->id)
         ]);
+    }
+
+    public function newLinkGenerate(Request $request, PlayerService $playerService): RedirectResponse
+    {
+        $token = $request->token;
+        $getPlayerViaToken = $this->getPlayerViaToken($token);
+        $player = $getPlayerViaToken?->player;
+        $tokenData = $playerService->accessTokenCreate($player);
+        return redirect()->route('index', ['token' => $tokenData->token]);
+    }
+
+    private function getPlayerViaToken(string $token)
+    {
+        return AccessToken::with('player')
+            ->where('token', $token)
+            ->where('status', true)
+            ->first();
     }
 
     private function playerHistory($id)
