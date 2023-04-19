@@ -10,16 +10,35 @@
                            value="{{ route('index') . '/?token=' . $token }}"
                            id="myLink">
                 </div>
-                <div class="form-group">
-                    <button class="btn btn-primary mt-2" onclick="copyLink()">
-                        Copy my link!
-                    </button>
-                    <form method="post" action="{{ route('new-link-generate') }}">
-                        @csrf
-                        <input hidden="hidden" name="token" value="{{ $token }}">
-                        <button type="submit" class="btn btn-outline-primary mt-2">Generate new link</button>
-                    </form>
-                    <button class="btn btn-outline-primary mt-2">Destroy link</button>
+                <div class="row">
+                    <div class="col-md-2">
+                        <button class="btn btn-primary mt-2 button-width" onclick="copyLink()">
+                            Copy my link!
+                        </button>
+                    </div>
+                    <div class="col-md-2">
+                        <form method="post" class="form-inline" action="{{ route('new-link-generate') }}">
+                            @csrf
+                            <label>
+                                <input hidden="hidden" name="token" value="{{ $token }}">
+                            </label>
+                            <button type="submit" class="btn btn-outline-primary mt-2 button-width">
+                                Generate new link
+                            </button>
+                        </form>
+                    </div>
+                    <div class="col-md-2">
+                        <form method="post" class="form-inline" action="{{ route('destroy-link') }}">
+                            @csrf
+                            @method('PUT')
+                            <label>
+                                <input hidden="hidden" name="token" value="{{ $token }}">
+                            </label>
+                            <button type="submit" class="btn btn-outline-primary mt-2 button-width">
+                                Destroy link
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
             <div class="container mt-5">
@@ -80,3 +99,8 @@
         }
     }
 </script>
+<style>
+    .button-width {
+        width: 180px;
+    }
+</style>

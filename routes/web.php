@@ -26,7 +26,7 @@ Route::get('/player-register-form', [PlayerController::class, 'playerRegisterFor
 Route::post('/player-create', [PlayerController::class, 'playerCreate'])->name('player-create');
 Route::post('/', [PlayerController::class, 'playerGame'])->name('main');
 Route::post('/new-link-generate', [PlayerController::class, 'newLinkGenerate'])->name('new-link-generate');
-
+Route::put('/destroy-link', [PlayerController::class, 'destroyLink'])->name('destroy-link');
 
 Auth::routes();
 

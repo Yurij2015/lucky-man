@@ -65,7 +65,18 @@ class PlayerController extends Controller
         return redirect()->route('index', ['token' => $tokenData->token]);
     }
 
-    private function getPlayerViaToken(string $token)
+    public function destroyLink(Request $request, PlayerService $playerService): RedirectResponse
+    {
+        $token = $request->token;
+        $getPlayerViaToken = $this->getPlayerViaToken($token);
+        if ($getPlayerViaToken) {
+            $getPlayerViaToken->status = false;
+            $getPlayerViaToken->save();
+        }
+        return redirect()->route('index');
+    }
+
+    private function getPlayerViaToken(?string $token)
     {
         return AccessToken::with('player')
             ->where('token', $token)
