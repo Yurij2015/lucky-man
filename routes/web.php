@@ -40,6 +40,6 @@ Route::middleware('auth')->group(function () {
     Route::get('admin/player-show/{player}', [AdminPlayerController::class, 'showPlayer'])->name('player-show');
     Route::put('admin/player-update/{player}', [AdminPlayerController::class, 'updatePlayer'])->name('player-update');
     Route::post('admin/player-create', [AdminPlayerController::class, 'playerCreate'])->name('admin-player-create');
-
+    Route::get('admin/new-token/{player}', [AdminPlayerController::class, 'newToken'])->name('admin-new-token');
 
 })->middleware('auth');

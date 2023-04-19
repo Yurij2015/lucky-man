@@ -45,4 +45,10 @@ class PlayerController extends Controller
         $player->delete();
         return redirect()->route('admin');
     }
+
+    public function newToken(Player $player, PlayerService $playerService): RedirectResponse
+    {
+        $playerService->accessTokenCreate($player);
+        return redirect()->route('player-show', $player->id);
+    }
 }
