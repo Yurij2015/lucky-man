@@ -69,6 +69,16 @@
                                     <td>{!! $row->status ? 'active' : 'no active' !!}</td>
                                 </tr>
                             @endforeach
+                            <tr>
+                                <td colspan="4">
+                                    <a href="{{ route('admin-new-token', $player->id) }}">
+                                        <button class="btn btn-xs btn-default text-success mx-1 shadow"
+                                                title="Add new token for user">
+                                            <i class="fa fa-lg fa-fw fa-plus-circle"></i>
+                                        </button>
+                                    </a>
+                                </td>
+                            </tr>
                         </x-adminlte-datatable>
                     </div>
                 </div>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PlayerSaveRequest;
+use App\Http\Services\PlayerService;
 use App\Models\AccessToken;
 use App\Models\Player;
 use App\Models\PlayerPoints;
@@ -14,9 +15,8 @@ class PlayerController extends Controller
 {
     public function index(Request $request)
     {
-
         $token = $request->token;
-        $getPlayerViaToken = AccessToken::with('player')->where('token', $token)->where('status', true)->first();
+        $getPlayerViaToken = $this->getPlayerViaToken($token);
         return view('player.index', ['player' => $getPlayerViaToken?->player, 'token' => $getPlayerViaToken?->token]);
     }
 
@@ -28,45 +28,86 @@ class PlayerController extends Controller
         return view('player.register');
     }
 
-    public function playerCreate(PlayerSaveRequest $playerSaveRequest): RedirectResponse
+    public function playerCreate(PlayerSaveRequest $playerSaveRequest, PlayerService $playerService): RedirectResponse
     {
         $player = Player::create($playerSaveRequest->all());
-        $tokenData = $this->accessTokenCreate($player);
+        $tokenData = $playerService->accessTokenCreate($player);
         return redirect()->route('player-register-form', ['token' => $tokenData->token]);
-    }
-
-    private function accessTokenCreate($player)
-    {
-        return AccessToken::create([
-            'player_id' => $player->id,
-            'token' => $this->getRandomStringToken($player),
-            'token_validity_period' => date("Y-m-d\ H:i:s\ ", strtotime("+7 day")),
-            'status' => true
-        ]);
     }
 
     /**
      * @throws Exception
      */
-    public function playerGame(Request $request)
+    public function playerGame(Request $request, PlayerService $playerService)
     {
         $token = $request->token;
-        $getPlayerViaToken = AccessToken::with('player')->where('token', $token)->where('status', true)->first();
+        $getPlayerViaToken = $this->getPlayerViaToken($token);
         $points = random_int(1, 1000);
-        $this->playerPointsSave($getPlayerViaToken, $points);
-        return view('player.index', ['player' => $getPlayerViaToken, 'token' => $token, 'points' => $points]);
-    }
-
-    private function playerPointsSave($getPlayerViaToken, $points): void
-    {
-        PlayerPoints::create([
-            'player_id' => $getPlayerViaToken?->player->id,
-            'points' => $points
+        $result = $points % 2 ? 'Now you\'re the loser' : 'You are now the WINNER!!!';
+        $prizeAmount = $points % 2 ? null : $this->getPrizeAmount($points);
+        $playerService->playerPointsSave($getPlayerViaToken, $points);
+        return view('player.index', [
+            'player' => $getPlayerViaToken?->player,
+            'token' => $token,
+            'points' => $points,
+            'result' => $result,
+            'prizeAmount' => $prizeAmount,
+            'history' => $this->playerHistory($getPlayerViaToken?->player->id)
         ]);
     }
 
-    private function getRandomStringToken(Player $player): string
+    public function newLinkGenerate(Request $request, PlayerService $playerService): RedirectResponse
     {
-        return md5($player->username . $player->phone . time());
+        $token = $request->token;
+        $getPlayerViaToken = $this->getPlayerViaToken($token);
+        $player = $getPlayerViaToken?->player;
+        $tokenData = $playerService->accessTokenCreate($player);
+        return redirect()->route('index', ['token' => $tokenData->token]);
+    }
+
+    public function destroyLink(Request $request, PlayerService $playerService): RedirectResponse
+    {
+        $token = $request->token;
+        $getPlayerViaToken = $this->getPlayerViaToken($token);
+        if ($getPlayerViaToken) {
+            $getPlayerViaToken->status = false;
+            $getPlayerViaToken->save();
+        }
+        return redirect()->route('index');
+    }
+
+    private function getPlayerViaToken(?string $token)
+    {
+        return AccessToken::with('player')
+            ->where('token', $token)
+            ->where('status', true)
+            ->first();
+    }
+
+    private function playerHistory($id)
+    {
+        return PlayerPoints::latest()->where('player_id', $id)->take(3)->get();
+    }
+
+    private function getPrizeAmount(int $points): ?float
+    {
+        foreach ($this->sourceData() as $key => $value) {
+            if ($points > $key) {
+                return $points * $value;
+            }
+        }
+        if ($points < 300) {
+            return $points * 0.1;
+        }
+        return null;
+    }
+
+    private function sourceData(): array
+    {
+        return [
+            900 => 0.7,
+            600 => 0.5,
+            300 => 0.3
+        ];
     }
 }

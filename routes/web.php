@@ -24,8 +24,9 @@ Route::get('/', static function () {
 Route::get('/', [PlayerController::class, 'index'])->name('index');
 Route::get('/player-register-form', [PlayerController::class, 'playerRegisterForm'])->name('player-register-form');
 Route::post('/player-create', [PlayerController::class, 'playerCreate'])->name('player-create');
-Route::post('/player-game', [PlayerController::class, 'playerGame'])->name('player-game');
-
+Route::post('/', [PlayerController::class, 'playerGame'])->name('main');
+Route::post('/new-link-generate', [PlayerController::class, 'newLinkGenerate'])->name('new-link-generate');
+Route::put('/destroy-link', [PlayerController::class, 'destroyLink'])->name('destroy-link');
 
 Auth::routes();
 
@@ -38,5 +39,7 @@ Route::middleware('auth')->group(function () {
         ->name('player-destroy');
     Route::get('admin/player-show/{player}', [AdminPlayerController::class, 'showPlayer'])->name('player-show');
     Route::put('admin/player-update/{player}', [AdminPlayerController::class, 'updatePlayer'])->name('player-update');
+    Route::post('admin/player-create', [AdminPlayerController::class, 'playerCreate'])->name('admin-player-create');
+    Route::get('admin/new-token/{player}', [AdminPlayerController::class, 'newToken'])->name('admin-new-token');
 
 })->middleware('auth');
